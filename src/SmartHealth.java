@@ -36,6 +36,8 @@ public class SmartHealth {
             ans=bufferedReader.readLine();
         } while(ans.equals("yes"));
 
+        System.out.print("test Line 2");
+
         System.out.println("");
 
 
