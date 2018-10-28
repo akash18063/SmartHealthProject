@@ -36,10 +36,14 @@ public class SmartHealth {
             ans=bufferedReader.readLine();
         } while(ans.equals("yes"));
 
+
         System.out.print("test Line 2");
 
         System.out.println("");
 
+        System.out.println("some changes are done here");
+
+        System.out.println("test line");
 
 
     }
