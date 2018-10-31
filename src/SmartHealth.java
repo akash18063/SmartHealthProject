@@ -2,6 +2,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+
+//contains patient information and all the operations that a patient can perform
 class Patient{
 //    methods for accessing patient table and getting and updating patient details
     boolean authenticate(String id, String pass){
@@ -17,7 +19,62 @@ class Patient{
 
     }
 }
-class Doctor{
+
+class User {
+    Profile profile;
+
+
+    void login()
+    {
+
+
+    }
+
+    void logout()
+    {
+
+
+    }
+
+    void editprofile()
+    {
+
+    }
+}
+
+ class Contact {
+    String email;
+    String phone;
+    Address adress;
+}
+
+
+ class Address {
+
+    String house_number;
+    String locality;
+    String state;
+    String country;
+    int pincode;
+
+}
+
+
+class Doctor extends User{
+
+    //attributes
+
+    int experience;
+    String speciality;
+    int departmentNumber;
+    int positionInDepartment;
+    int schedule;
+
+
+    //constructor
+    Doctor() {
+    }
+
     void add_doctor(){
 
     }
@@ -27,7 +84,27 @@ class Doctor{
     void update(){
 
     }
+
+
 }
+
+
+
+
+
+class Profile {
+
+
+    String name;
+    int age;
+    String gender;
+    Contact contact;
+    String id;
+    String username;
+    String password;
+}
+
+
 class TimeSlots{
     void get_doctor_slots(String id){
 
