@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -354,14 +355,61 @@ public class SmartHealth {
         String menu_option=bufferedReader.readLine();
 
             if (menu_option.equals("1")) {
-                System.out.println("What do you want to do ?");
-                System.out.println("1.Login");
-                System.out.println("2.Register");
+               System.out.println("Welcome Admin");
+               System.out.println("Login as admin to continue ");
+               System.out.println("enter your ID");
+               String id=bufferedReader.readLine();
+               System.out.println("Enter password :");
+               String password=bufferedReader.readLine();
+               String admin_continue="no";
+               if(id.equals("admin") && password.equals("admin123"))
+               {
+                   do
+                   {
+                       System.out.println("Please select from the options :");
+                       System.out.println("1. Add a Doctor \n2. Handle transfer request \n3. View users of the application \n4. Logout");
+                       String admin_menu_option=bufferedReader.readLine();
+                       if(admin_menu_option.equals("1"))
+                       {
+                           //take details of the doctor and enter into database
+                       }
+                       else if(admin_menu_option.equals("2"))
+                       {
+                           //handle transfer request (implement it later)
+                       }
+
+                       else if(admin_menu_option.equals("3"))
+                       {
+                           //view users(easy using database)
+                       }
+                       else if(admin_menu_option.equals("4"))
+                       {
+                           System.out.println("you have been successfully logged out !!!");
+
+                           break;
+                       }
+                       else
+                       {
+                           continue;
+
+                       }
+
+
+                   }
+                   while(admin_continue.equals("yes"));
+               }
+               else
+               {
+                    System.out.println("Incorrect ID or Password");
+
+                   continue;
+
+               }
+
             } else if (menu_option.equals("2")) {
 
                 System.out.println("What do you want to do ?");
                 System.out.println("1.Login");
-
                 System.out.println("2.Register");
                 String pch =bufferedReader.readLine();
                 if (pch.equals("1")) {
