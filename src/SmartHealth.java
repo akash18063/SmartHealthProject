@@ -1,18 +1,38 @@
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.*;
 
 
 //contains patient information and all the operations that a patient can perform
-class Patient{
+class Patient extends User{
+
+
+    Patient()
+    {
+
+        //Default constructor
+    }
+
+    Patient(String name,int age, String gender, String contact, String address, String email, String password,String patient_id)
+    {
+        super(name,age,gender, contact, address,  email, password, patient_id);
+
+    }
+
 //    methods for accessing patient table and getting and updating patient details
     boolean authenticate(String id, String pass){
-        return true;
+
+        return login(id,pass);
     }
     void register_patient(){
 
     }
-    void get_patient(String username){
+    Profile get_patient(){
+
+        return this.getProfile();
+
 
     }
     void update(){
@@ -20,14 +40,47 @@ class Patient{
     }
 }
 
+//class that contains the profile
 class User {
-    Profile profile;
+    private Profile profile;
 
-
-    void login()
+    User()
     {
 
 
+
+    }
+
+    User(String name,int age, String gender, String contact, String address, String email, String password,String patient_id)
+    {
+        profile=new Profile();
+        profile.setName(name);
+        profile.setAge(age);
+        profile.setGender(gender);
+        profile.setContact(contact);
+        profile.setAddress(address);
+        profile.setEmail(email);
+        profile.setEmail(password);
+        profile.setId(patient_id);
+    }
+
+
+
+    public Profile getProfile() {
+        return profile;
+    }
+
+    boolean login(String id , String password)
+    {
+        String pass=null;
+        //get the password of the id from table
+        if(pass.equals(password))
+        {
+            return true;
+
+        }
+
+        return false;
     }
 
     void logout()
@@ -42,38 +95,193 @@ class User {
     }
 }
 
- class Contact {
-    String email;
-    String phone;
-    Address adress;
+
+//class to save the profile
+class Profile {
+
+
+    private String name;
+    private int age;
+    private String gender;
+    private String contact;
+    private String id;
+    private String address;
+    private String email;
+    //String username;
+    private String password;
+
+
+    void setName(String name)
+    {
+        this.name=name;
+    }
+    void setAge(int age)
+    {
+        this.age=age;
+
+    }
+
+
+    void setGender(String gender)
+    {
+        this.gender=gender;
+    }
+
+    void setContact(String contact)
+    {
+        this.contact=contact;
+    }
+    void setId(String id)
+    {
+        this.id=id;
+
+    }
+    void setAddress(String address)
+    {
+        this.address=address;
+
+    }
+
+    void setEmail(String email)
+    {
+        this.email=email;
+
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
 }
 
 
- class Address {
 
-    String house_number;
-    String locality;
-    String state;
-    String country;
-    int pincode;
+//class for initiating transfer request
+class TransferRequest
+{
+    private String patientID;
+    private String doctorID;
+    private String departmentID;
 
 }
 
 
+//class for admin
+class Admin
+{
+
+    private String username;
+    private String password;
+
+    void login()
+    {
+
+
+    }
+
+    int registerDoctor()
+    {
+        return 0;
+
+    }
+
+    void viewUser()
+    {
+
+
+    }
+
+    void checkTrasferRequest()
+    {
+
+
+    }
+
+    void handleTransferRequest(TransferRequest transferRequest)
+    {
+
+
+    }
+    void logout()
+    {
+
+
+    }
+
+}
+
+
+////class for storing the contact
+// class Contact {
+//    private String email;
+//    private String phone;
+//    private Address adress;
+//
+//    Contact()
+//    {
+//
+//
+//    }
+//}
+
+
+
+////class for storing the address
+// class Address {
+//
+//    private String house_number;
+//    private String locality;
+//    private String state;
+//    private String country;
+//    private int pincode;
+//
+//}
+
+
+
+//doctor class
 class Doctor extends User{
 
     //attributes
 
-    int experience;
-    String speciality;
-    int departmentNumber;
-    int positionInDepartment;
-    int schedule;
+    private int experience;
+    private String speciality;
+    private int departmentNumber;
+    private int positionInDepartment;
+    private int schedule;
 
 
     //constructor
-    Doctor() {
-    }
+//    Doctor() {
+//
+//    }
 
     void add_doctor(){
 
@@ -92,17 +300,7 @@ class Doctor extends User{
 
 
 
-class Profile {
 
-
-    String name;
-    int age;
-    String gender;
-    Contact contact;
-    String id;
-    String username;
-    String password;
-}
 
 
 class TimeSlots{
@@ -117,12 +315,40 @@ class TimeSlots{
     }
 }
 
+//SmartHealthApplication class contains the operations performed on patients and doctors
+class SmartHealthApplication
+{
+
+     void  registerPatient(Patient patient,Connection connection) throws SQLException {
+        Profile profile=patient.get_patient();
+
+        Statement statement=connection.createStatement();
+       statement.execute("insert into Patient values ('" + profile.getId()+"','"+profile.getName()+"',"+profile.getAge()+",'"+profile.getGender()+"','"+profile.getContact()+"','"+profile.getAddress()+"','"+profile.getPassword()+"','"+profile.getEmail()+"')");
+
+
+
+
+
+    }
+}
+
+
+
 public class SmartHealth {
 
-    public static  void main(String[] args) throws IOException {
+    private static int  patient_ID=1;
+
+    private long doctor_ID=1;
+
+    public static  void main(String[] args) throws IOException, ClassNotFoundException, SQLException {
+
+
         String ans = "no";
         InputStreamReader inputStreamReader=new InputStreamReader(System.in);
         BufferedReader bufferedReader=new BufferedReader(inputStreamReader);
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        Connection connection= DriverManager.getConnection("jdbc:mysql://localhost:3306/shs","root","akashgosain");
+        SmartHealthApplication smartHealthApplication=new SmartHealthApplication();
         do{
         System.out.println("Who are you ? \n1.Admin\n2.patients\n3.Doctors");
         String menu_option=bufferedReader.readLine();
@@ -142,8 +368,8 @@ public class SmartHealth {
                     System.out.println("Enter your id:");
                     String pid = bufferedReader.readLine();
                     String pass = bufferedReader.readLine();
-                    boolean is_authenticated = new Patient().authenticate(pid,pass);
-                    if(! is_authenticated){
+                     new Patient().authenticate(pid,pass);
+                    if(true){
                         System.out.println("User id or password doesn't match");
                     }
                     else{
@@ -165,10 +391,44 @@ public class SmartHealth {
                     }
                 }
                 else if (pch.equals("2")) {
-                    //Register patient using Patient class
-                    // get details
-                    // assign id
-                    // get requirements
+
+                    System.out.println("Enter your name :");
+                    String name=bufferedReader.readLine();
+                    System.out.println("Enter your age :");
+                    int age=Integer.parseInt(bufferedReader.readLine());
+                    System.out.println("Enter your gender");
+                    String gender=bufferedReader.readLine();
+                    System.out.println("Enter your contact number :");
+                    String contact=bufferedReader.readLine();
+                    System.out.println("Enter your address :");
+                    String address=bufferedReader.readLine();
+                    System.out.println("Enter your email address :");
+                    String email=bufferedReader.readLine();
+                    System.out.println("Enter the password :");
+                    String password=bufferedReader.readLine();
+
+                    StringBuilder stringBuilder=new StringBuilder();
+                    stringBuilder.append("patient_");
+                    stringBuilder.append(patient_ID);
+                    String patientID=stringBuilder.toString();
+
+
+                    Patient patient=new Patient(name,age,gender,contact,address,email,password,patientID);
+                    patient_ID++;
+                    try
+                    {
+                        smartHealthApplication.registerPatient(patient,connection);
+                        System.out.println("you have been successfully registered with ID : " + patientID);
+
+
+                    }
+                    catch (Exception e)
+                    {
+                        System.out.println("Could not register you !!! Please try after some time");
+
+                    }
+
+
 
                 }
             } else if (menu_option.equals("3")) {
