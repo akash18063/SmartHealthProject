@@ -5,336 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.*;
 
-
-//contains patient information and all the operations that a patient can perform
-class Patient extends User{
-
-
-    Patient()
-    {
-
-        //Default constructor
-    }
-
-    Patient(String name,int age, String gender, String contact, String address, String email, String password,String patient_id)
-    {
-        super(name,age,gender, contact, address,  email, password, patient_id);
-
-    }
-
-//    methods for accessing patient table and getting and updating patient details
-    boolean authenticate(String id, String pass){
-
-        return login(id,pass);
-    }
-    void register_patient(){
-
-    }
-    Profile get_patient(){
-
-        return this.getProfile();
-
-
-    }
-    void update(){
-
-    }
-}
-
-//class that contains the profile
-class User {
-    private Profile profile;
-
-    User()
-    {
-
-
-
-    }
-
-    User(String name,int age, String gender, String contact, String address, String email, String password,String patient_id)
-    {
-        profile=new Profile();
-        profile.setName(name);
-        profile.setAge(age);
-        profile.setGender(gender);
-        profile.setContact(contact);
-        profile.setAddress(address);
-        profile.setEmail(email);
-        profile.setEmail(password);
-        profile.setId(patient_id);
-    }
-
-
-
-    public Profile getProfile() {
-        return profile;
-    }
-
-    boolean login(String id , String password)
-    {
-        String pass=null;
-        //get the password of the id from table
-        if(pass.equals(password))
-        {
-            return true;
-
-        }
-
-        return false;
-    }
-
-    void logout()
-    {
-
-
-    }
-
-    void editprofile()
-    {
-
-    }
-}
-
-
-//class to save the profile
-class Profile {
-
-
-    private String name;
-    private int age;
-    private String gender;
-    private String contact;
-    private String id;
-    private String address;
-    private String email;
-    //String username;
-    private String password;
-
-
-    void setName(String name)
-    {
-        this.name=name;
-    }
-    void setAge(int age)
-    {
-        this.age=age;
-
-    }
-
-
-    void setGender(String gender)
-    {
-        this.gender=gender;
-    }
-
-    void setContact(String contact)
-    {
-        this.contact=contact;
-    }
-    void setId(String id)
-    {
-        this.id=id;
-
-    }
-    void setAddress(String address)
-    {
-        this.address=address;
-
-    }
-
-    void setEmail(String email)
-    {
-        this.email=email;
-
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public String getContact() {
-        return contact;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-}
-
-
-
-//class for initiating transfer request
-class TransferRequest
-{
-    private String patientID;
-    private String doctorID;
-    private String departmentID;
-
-}
-
-
-//class for admin
-class Admin
-{
-
-    private String username;
-    private String password;
-
-    void login()
-    {
-
-
-    }
-
-    int registerDoctor()
-    {
-        return 0;
-
-    }
-
-    void viewUser()
-    {
-
-
-    }
-
-    void checkTrasferRequest()
-    {
-
-
-    }
-
-    void handleTransferRequest(TransferRequest transferRequest)
-    {
-
-
-    }
-    void logout()
-    {
-
-
-    }
-
-}
-
-
-////class for storing the contact
-// class Contact {
-//    private String email;
-//    private String phone;
-//    private Address adress;
-//
-//    Contact()
-//    {
-//
-//
-//    }
-//}
-
-
-
-////class for storing the address
-// class Address {
-//
-//    private String house_number;
-//    private String locality;
-//    private String state;
-//    private String country;
-//    private int pincode;
-//
-//}
-
-
-
-//doctor class
-class Doctor extends User{
-
-    //attributes
-
-    private int experience;
-    private String speciality;
-    private int departmentNumber;
-    private int positionInDepartment;
-    private int schedule;
-
-
-    //constructor
-//    Doctor() {
-//
-//    }
-
-    void add_doctor(){
-
-    }
-    void get_doctor(){
-
-    }
-    void update(){
-
-    }
-
-
-}
-
-
-
-
-
-
-
-
-class TimeSlots{
-    void get_doctor_slots(String id){
-
-    }
-    void update_slot(String id,String time) {
-
-    }
-    void add_slot(){
-
-    }
-}
-
-//SmartHealthApplication class contains the operations performed on patients and doctors
-class SmartHealthApplication
-{
-
-     void  registerPatient(Patient patient,Connection connection) throws SQLException {
-        Profile profile=patient.get_patient();
-
-        Statement statement=connection.createStatement();
-       statement.execute("insert into Patient values ('" + profile.getId()+"','"+profile.getName()+"',"+profile.getAge()+",'"+profile.getGender()+"','"+profile.getContact()+"','"+profile.getAddress()+"','"+profile.getPassword()+"','"+profile.getEmail()+"')");
-
-
-
-
-
-    }
-}
-
-
-
 public class SmartHealth {
 
     private static int  patient_ID=1;
@@ -367,11 +37,15 @@ public class SmartHealth {
                    do
                    {
                        System.out.println("Please select from the options :");
-                       System.out.println("1. Add a Doctor \n2. Handle transfer request \n3. View users of the application \n4. Logout");
+                       System.out.println("1. Add a Doctor \n2. Reassign Doctors for a patient \n3. View list of doctors \n4. View list of patients \n5. logout");
                        String admin_menu_option=bufferedReader.readLine();
                        if(admin_menu_option.equals("1"))
                        {
                            //take details of the doctor and enter into database
+                           System.out.println("Enter the name of the doctor :");
+                           String doctor_name=bufferedReader.readLine();
+                           System.out.println("Enter the ");
+
                        }
                        else if(admin_menu_option.equals("2"))
                        {
@@ -380,9 +54,39 @@ public class SmartHealth {
 
                        else if(admin_menu_option.equals("3"))
                        {
-                           //view users(easy using database)
+                           //list the doctors registered
+                           System.out.println("Wanna view doctor's profile");
+                           String opt=bufferedReader.readLine();
+                           if(opt.equals("yes"))
+                           {
+                               System.out.println("Enter the doctor ID from the list above");
+                               String doc_id=bufferedReader.readLine();
+                               //call display doctor and display the details
+                           }
+                           else
+                           {
+                               //do nothing
+                           }
                        }
                        else if(admin_menu_option.equals("4"))
+                       {
+                           //list the patients registered
+                           System.out.println("Wanna view patient's profile");
+                           String opt=bufferedReader.readLine();
+                           if(opt.equals("yes"))
+                           {
+                               System.out.println("Enter the patient ID from the list above");
+                               String pat_id=bufferedReader.readLine();
+                               //call display patients and display the details
+                           }
+                           else
+                           {
+                               //do nothing
+                           }
+
+
+                       }
+                       else if(admin_menu_option.equals("5"))
                        {
                            System.out.println("you have been successfully logged out !!!");
 
