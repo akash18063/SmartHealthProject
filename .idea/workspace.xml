@@ -1,31 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="bcd51818-00a3-4be2-a39a-a18c12becbdd" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Admin.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Doctor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/JuniorResident.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Patient.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Profile.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/SeniorResident.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/SeniorSpecialist.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/SmartHealthApplication.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Specialist.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/TimeSlots.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/TransferRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SmartHealthProject/Admin.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SmartHealthProject/Admin.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SmartHealthProject/Doctor.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SmartHealthProject/Doctor.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SmartHealthProject/Patient.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SmartHealthProject/Patient.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SmartHealthProject/Profile.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SmartHealthProject/Profile.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SmartHealthProject/SmartHealth.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SmartHealthProject/SmartHealth.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SmartHealthProject/SmartHealthApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SmartHealthProject/SmartHealthApplication.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SmartHealthProject/TimeSlots.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SmartHealthProject/TimeSlots.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SmartHealthProject/TransferRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SmartHealthProject/TransferRequest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SmartHealthProject/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SmartHealthProject/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SmartHealth.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/SmartHealth.java" afterDir="false" />
-    </list>
+    <list default="true" id="bcd51818-00a3-4be2-a39a-a18c12becbdd" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -73,7 +49,7 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/SmartHealth.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="437">
+            <state relative-caret-position="230">
               <caret line="46" column="57" selection-start-line="46" selection-start-column="57" selection-end-line="46" selection-end-column="57" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -199,7 +175,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="301" />
     <option name="y" value="57" />
     <option name="width" value="1400" />
@@ -294,10 +270,9 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="83" y="25" width="1837" height="1055" extended-state="6" />
-    <editor active="true" />
+    <frame x="83" y="25" width="1837" height="1055" extended-state="7" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18458076" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18458076" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="UI Designer" order="3" />
@@ -310,7 +285,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32924107" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Terminal" order="8" weight="0.3470982" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.3463687" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Messages" order="10" weight="0.32924107" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -420,7 +395,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/SmartHealth.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="437">
+        <state relative-caret-position="230">
           <caret line="46" column="57" selection-start-line="46" selection-start-column="57" selection-end-line="46" selection-end-column="57" />
           <folding>
             <element signature="imports" expanded="true" />
