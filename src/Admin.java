@@ -1,10 +1,7 @@
 import sun.awt.geom.AreaOp;
 
 import javax.print.Doc;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Time;
+import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -165,6 +162,31 @@ public class Admin {
 
     }
 
+    int transferPatient(Connection connection,TransferRequest t) throws SQLException {
+
+//        PreparedStatement preparedStatement=connection.prepareStatement("select * from Doctor where doctor_id = ?");
+//        preparedStatement.setString(1,t.getDoctor_id_to);
+//        ResultSet resultSet=preparedStatement.executeQuery();
+//        preparedStatement.close();
+        PreparedStatement preparedStatement1=connection.prepareStatement("update Patient set doctor_id = ? , seen = 0 , dept_id = ? where patient_id = ?");
+        preparedStatement1.setString(1,t.getGetDoctor_id_to());
+        preparedStatement1.setInt(2,t.getDept_id_to());
+        preparedStatement1.setString(3,t.getPatient_id());
+        preparedStatement1.executeUpdate();
+        preparedStatement1.close();
+        PreparedStatement preparedStatement2=connection.prepareStatement("delete TransferRequest where request_id = ?");
+        preparedStatement2.setInt(1,t.getTransfer_id());
+        int value=preparedStatement2.executeUpdate();
+
+        return value;
+
+
+
+
+
+
+    }
+
     void viewUser()
     {
 
@@ -178,6 +200,8 @@ public class Admin {
 
     void handleTransferRequest(TransferRequest transferRequest)
     {
+
+
 
 
     }

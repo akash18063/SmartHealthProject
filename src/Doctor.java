@@ -34,7 +34,7 @@ public class Doctor extends User{
     //default constructor
     Doctor()
     {
-
+            super();
 
     }
 
@@ -162,8 +162,8 @@ public class Doctor extends User{
     }
 
     boolean showTodaysAppointment(Connection connection) throws SQLException {
-        System.out.println("Your appointments :");
-        PreparedStatement preparedStatement1=connection.prepareStatement("select * from Slots where doctor_id = ? and state = ? and date = ?");
+
+        PreparedStatement preparedStatement1=connection.prepareStatement("select * from Slots where doctor_id = ? and state = ? and slot_date = ?");
         preparedStatement1.setString(1,this.getProfile().getId());
         preparedStatement1.setString(2,"occupied");
         preparedStatement1.setDate(3,new java.sql.Date(new Date().getTime()));
@@ -173,6 +173,7 @@ public class Doctor extends User{
             System.out.println("you don't have any appointments today");
             return false;
         }
+        System.out.println("Your appointments :");
         System.out.println("Patient ID      Patient name        start time      end time        day     date");
         System.out.println("---------------------------------------------------------------------------------------");
         while(resultSet1.next())

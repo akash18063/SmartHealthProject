@@ -1,4 +1,6 @@
 class TimeSlots{
+
+
     void get_doctor_slots(String id){
 
     }

@@ -1,3 +1,5 @@
+import java.security.NoSuchAlgorithmException;
+
 class Profile {
 
 
@@ -52,7 +54,14 @@ class Profile {
     }
     void setPassword(String password)
     {
-        this.password=password;
+
+        try {
+            this.password = StringHash.getHash(password);
+        }
+        catch(NoSuchAlgorithmException e){
+
+        }
+        //this.password=password;
 
     }
 

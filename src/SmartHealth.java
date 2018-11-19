@@ -14,10 +14,119 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class SmartHealth {
+//
+//    private static int  patient_ID=1;
+//
+//    private long doctor_ID=10000;
 
-    private static int  patient_ID=1;
+    public static void show_departments(Connection connection)throws SQLException{
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("select * from Department");
 
-    private long doctor_ID=10000;
+        System.out.println("------------------------------------------------------");
+        while (resultSet.next()) {
+            int dept_id = resultSet.getInt("dept_id");
+            String dept_name = resultSet.getString("dept_name");
+            System.out.println(dept_id + "           " + dept_name);
+            System.out.println("------------------------------------------------------");
+        }
+        statement.close();
+    }
+
+    public static void show_doctors(Connection connection, int d_id)throws SQLException{
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("select * from Doctor where dept_id = "+d_id);
+        System.out.println("------------------------------------------------------");
+        while (resultSet.next()) {
+            String doctor_id = resultSet.getString("doctor_id");
+            float exp = resultSet.getFloat("experience");
+            int doctor_age = resultSet.getInt("doctor_age");
+            String doctor_name = resultSet.getString("doctor_name");
+            String gender = resultSet.getString("gender");
+            System.out.println(doctor_id + "    " + doctor_name + "     "  );
+            System.out.println("------------------------------------------------------");
+        }
+        statement.close();
+    }
+
+    public static void clear_slots(Connection connection){
+        try{
+            PreparedStatement ps=connection.prepareStatement("Update Slots Set slot_date = DATE_ADD(slot_date, INTERVAL 7 DAY), state=? where slot_date < CURDATE()");
+            ps.setString(1,"free");
+            ps.executeUpdate();
+            ps.close();
+        }
+        catch(Exception e){
+
+        }
+    }
+
+    public static ArrayList<Integer> show_slots(Connection connection, String doc_id){
+        ArrayList list = new ArrayList<Integer>();
+
+        try {
+            Statement stmt = connection.createStatement();
+            String query = "select slot_id,slot_date,slot_day,start_time,end_time from Slots where doctor_id = \"" + doc_id + "\" and state = \"free\" order by slot_date";
+            ResultSet resultSet = stmt.executeQuery(query);
+            java.util.Date today = new java.util.Date();
+            Time ct = new Time(today.getTime());
+            System.out.println("------------------------------------------------------");
+            System.out.println("slot_id\tslot_date\tslot_day\tstart_time\tend_time");
+            System.out.println("------------------------------------------------------");
+
+
+            while (resultSet.next()) {
+                Time st = resultSet.getTime("start_time");
+                java.sql.Date date = resultSet.getDate("slot_date");
+                java.util.Date d1 = (java.util.Date) today.clone();
+                d1.setYear(date.getYear());
+                d1.setMonth(date.getMonth());
+                d1.setDate(date.getDate());
+                int st1 = Integer.parseInt(st.toString().replaceAll(":",""));
+                int ct1 = Integer.parseInt(ct.toString().replaceAll(":",""));
+
+                if(d1.compareTo(today)==0 && st1<=ct1){
+                    continue;
+                }
+                Time et = resultSet.getTime("end_time");
+                int id = resultSet.getInt("slot_id");
+                String day = resultSet.getString("slot_day");
+                System.out.println("\t" + id + "\t" + date.toString() + "\t\t" + day + "\t\t" + st.toString() + "\t" + et.toString());
+                System.out.println("------------------------------------------------------");
+                list.add(id);
+            }
+            stmt.close();
+        }
+        catch(Exception e) {
+
+        }
+        return list;
+    }
+
+    //Intelligent Algo for doctor allotment
+    public static String algo(Connection connection,int dep_id){
+        String doc_id="";
+        try {
+            Statement stmt = connection.createStatement();
+            String query = "select doctor_id from Slots where state = \"free\" and doctor_id in " +
+                    "(select doctor_id from Doctor where dept_id = " + dep_id + " ) GROUP BY doctor_id ORDER BY COUNT(*) DESC";
+            ResultSet rs = stmt.executeQuery(query);
+            stmt.close();
+            if (rs.next()) {
+                doc_id = rs.getString("doctor_id");
+            }
+            else {
+                stmt = connection.createStatement();
+                rs = stmt.executeQuery("select doctor_id from Doctor LIMIT 1");
+                rs.next();
+                doc_id = rs.getString("doctor_id");
+            }
+        }
+        catch(SQLException e){
+
+        }
+        return doc_id;
+    }
 
     public static  void main(String[] args) throws IOException, ClassNotFoundException, SQLException, ParseException {
 
@@ -27,7 +136,7 @@ public class SmartHealth {
         BufferedReader bufferedReader=new BufferedReader(inputStreamReader);
         Class.forName("com.mysql.cj.jdbc.Driver");
         Connection connection= DriverManager.getConnection("jdbc:mysql://localhost:3306/shs","root","akashgosain");
-        SmartHealthApplication smartHealthApplication=new SmartHealthApplication();
+        //SmartHealthApplication smartHealthApplication=new SmartHealthApplication();
         do{
         System.out.println("Who are you ? \n1.Admin\n2.patients\n3.Doctors");
         String menu_option=bufferedReader.readLine();
@@ -46,7 +155,7 @@ public class SmartHealth {
                    do
                    {
                        System.out.println("Please select from the options :");
-                       System.out.println("1. Add a Doctor \n2. Reassign Doctors for a patient \n3. View list of doctors \n4. View list of patients \n5. logout");
+                       System.out.println("1. Add a Doctor \n2. Handle transfer request  \n3. View list of doctors \n4. View list of patients \n5. logout");
                        String admin_menu_option=bufferedReader.readLine();
                        if(admin_menu_option.equals("1"))
                        {
@@ -206,7 +315,7 @@ public class SmartHealth {
                            String short_form=dept_name.substring(0,3);
                            String doctor_id=short_form+"_"+String.valueOf(doctor_id_res);
 
-                            Doctor doctor=new Doctor(doctor_name,Integer.parseInt(age), gender, contact, address,  email, password, doctor_id, experience, speciality, dept_id_int,Integer.parseInt(position), Integer.parseInt(surgeon), days);
+                            Doctor doctor=new Doctor(doctor_name,Integer.parseInt(age), gender, contact, address,  email, pass_string, doctor_id, experience, speciality, dept_id_int,Integer.parseInt(position), Integer.parseInt(surgeon), days);
 
                             admin.addDoctor(connection,doctor);
 
@@ -223,8 +332,53 @@ public class SmartHealth {
                        }
                        else if(admin_menu_option.equals("2"))
                        {
+                                System.out.println("Please select the transfer requests to :");
 
-                           //handle transfer request (implement it later)
+                                TransferRequest transferRequest=null;
+                                PreparedStatement preparedStatement=connection.prepareStatement("select * from TransferRequest");
+                                ResultSet resultSet=preparedStatement.executeQuery();
+                                while(resultSet.next())
+                                {
+                                    transferRequest=new TransferRequest(resultSet.getInt(resultSet.getInt("request_id")),resultSet.getString(resultSet.getString("doctor_from_id")),resultSet.getString("doctor_to_id"),resultSet.getInt("dept_from_id"),resultSet.getInt("dept_to_id"),resultSet.getString("patient_id"));
+                                    transferRequest.displayrequest();
+
+                                }
+                                preparedStatement.close();
+                                String req_id =bufferedReader.readLine();
+                                String req_ids[]=req_id.split(",");
+                                for(int i=0;i<req_ids.length;i++) {
+                                    PreparedStatement preparedStatement1 = connection.prepareStatement("select * from TransferRequest where request_id = ?");
+                                    preparedStatement.setInt(1, Integer.parseInt(req_ids[i]));
+                                    ResultSet resultSet1 = preparedStatement.executeQuery();
+                                    if (!resultSet1.next()) {
+                                        System.out.println("please enter valid request id");
+                                        break;
+                                    }
+
+                                    preparedStatement1.close();
+                                    PreparedStatement preparedStatement2 = connection.prepareStatement("select * from TransferRequest where request_id = ?");
+                                    preparedStatement2.setInt(1, Integer.parseInt(req_id));
+                                    ResultSet resultSet2 = preparedStatement2.executeQuery();
+                                    while (resultSet2.next()) {
+                                        transferRequest = new TransferRequest(resultSet.getInt(resultSet2.getInt("request_id")), resultSet2.getString("doctor_from_id"), resultSet2.getString("doctor_to_id"), resultSet2.getInt("dept_from_id"), resultSet2.getInt("dept_to_id"), resultSet2.getString("patient_id"));
+                                        int value=admin.transferPatient(connection,transferRequest);
+                                        if(value==0)
+                                        {
+                                            System.out.println("could not approve the transfer with ID :" +transferRequest.getTransfer_id());
+                                        }
+                                        else
+                                        {
+                                            System.out.println("approved the transfer having ID :"+transferRequest.getTransfer_id());
+
+                                        }
+
+                                    }
+                                }
+
+
+
+
+
 
                        }
 
@@ -274,6 +428,9 @@ public class SmartHealth {
 
                        }
 
+                       System.out.println("do you wanna continue(yes/no)");
+                       admin_continue=bufferedReader.readLine();
+
 
                    }
                    while(admin_continue.equals("yes"));
@@ -296,26 +453,169 @@ public class SmartHealth {
                     System.out.println("Enter your id:");
                     String pid = bufferedReader.readLine();
                     String pass = bufferedReader.readLine();
-                     new Patient().authenticate(pid,pass);
-                    if(true){
+                    boolean auth = new Patient().authenticate(connection, pid, pass);
+                    if(!auth){
                         System.out.println("User id or password doesn't match");
                     }
-                    else{
-                        System.out.println("MENU\n1) Explore doctors2) Update Requirements\n3) Edit Profile\n4) Logout");
-                        pch = bufferedReader.readLine();
-                        if(pch.equals("1")){
-                            //get requirements and search doctor
+                    else {
+                        // get patient details from table Patient
+                        do {
+                            Boolean cancel = false;
+                            Statement statement;
+                            System.out.println("MENU\n1) Book appointment2) View Appointment\n3) Edit Profile\n4) Logout");
+                            pch = bufferedReader.readLine();
+                            if (pch.equals("1")) {
+                                clear_slots(connection);
+                                statement = connection.createStatement();
+                                ResultSet rs = statement.executeQuery("select * from Slots where patient_id = \"" + pid + "\" and not slot = \"free\"");
+                                if(rs.next()){
+                                    System.out.println("You already have a booked appointment");
+                                    continue;
+                                }
+                                statement = connection.createStatement();
+                                ResultSet resultSet1 = statement.executeQuery("select * from Patient where patient_id=" + pid);
+                                resultSet1.next();
+                                int d_id = resultSet1.getInt("dept_id");
+                                String doc_id = resultSet1.getString("doctor_id");
+                                int location = resultSet1.getInt("location");
+                                statement.close();
+                                if (location == 2) {
+                                    System.out.println("Please come and check with the doctor to get admitted.");
+                                }
+                                else {
+                                    ArrayList list = show_slots(connection, doc_id);
+                                    System.out.println("Enter slot_id of your preferred slot, 0 for cancel:");
+                                    int s_id;
+                                    do {
+                                        s_id = Integer.parseInt(bufferedReader.readLine());
+                                        if (list.contains(s_id))
+                                            break;
+                                        System.out.println("Not a valid slot_id, Enter slot_id of above shown slots");
+                                    } while (true);
+                                    PreparedStatement ps = connection.prepareStatement("update Slots set patient_id = ? , state = ? where slot_id = ?");
+                                    ps.setString(1, pid);
+                                    ps.setString(2, "occupied");
+                                    ps.setInt(3, s_id);
+                                    ps.executeUpdate();
+                                    ps.close();
+                                    System.out.println("Appointment Booked");
+                                }
+                            }
+                            else if (pch.equals("2")) {
+                                clear_slots(connection);
+                                statement = connection.createStatement();
+                                ResultSet rs = statement.executeQuery("select * from Slots where patient_id = \"" + pid + "\" and not slot = \"free\"");
+                                statement.close();
+                                if(rs.next()){
+                                    System.out.println("Doctor_id\tDate\tDay\tStart_time\tEnd_time");
+                                    int slot_id = rs.getInt("slot_id");
+                                    System.out.println(rs.getString("doctor_id")+"\t\t"+rs.getDate("slot_date").toString()+"\t"
+                                            +rs.getString("slot_day"+"\t"+rs.getTime("start_time").toString()+"\t"+rs.getTime("end_time").toString()));
+                                    System.out.println("Want to cancel(yes/no)");
+                                    if(bufferedReader.readLine().equals("yes")){
+                                        PreparedStatement ps=connection.prepareStatement("Update Slots set state = \"free\" where slot_id = ?");
+                                        ps.setInt(1,slot_id);
+                                        ps.executeUpdate();
+                                        ps.close();
+                                        System.out.println("Appointment Cancelled");
+                                    }
+                                }
+                                else{
+                                    System.out.println("You don't have any appointment scheduled, or there is a change in schedule of doctor." +
+                                            " Book appointment from main menu");
+                                }
+                            }
+                            else if (pch.equals("3")) {
+                                System.out.println("Want to change email(yes/no):");
+                                if(bufferedReader.readLine().equals("yes")){
+                                    System.out.println("Enter new email id");
+                                    String email = bufferedReader.readLine();
+                                    PreparedStatement ps=connection.prepareStatement("Update Patient set email = ? where patient_id = ?");
+                                    ps.setString(1,email);
+                                    ps.setString(2,pid);
+                                    ps.executeUpdate();
+                                    ps.close();
+                                }
+                                System.out.println("Want to change contact no(yes/no):");
+                                if(bufferedReader.readLine().equals("yes")){
+                                    System.out.println("Enter new contact no");
+                                    String contact = bufferedReader.readLine();
+                                    PreparedStatement ps=connection.prepareStatement("Update Patient set contact = ? where patient_id = ?");
+                                    ps.setString(1,contact);
+                                    ps.setString(2,pid);
+                                    ps.executeUpdate();
+                                    ps.close();
+                                }
+                                System.out.println("Want to change category(yes/no):");
+                                if(bufferedReader.readLine().equals("yes")){
+                                    clear_slots(connection);
+                                    statement = connection.createStatement();
+                                    ResultSet rs = statement.executeQuery("select * from Slots where patient_id = \"" + pid + "\" and not slot = \"free\"");
+                                    statement.close();
+                                    if(rs.next()){
+                                        System.out.println("You already have a booked appointment, First cancel it and then try to change category again");
+                                    }
+                                    else {
+                                        int d_id;
+                                        show_departments(connection);
+                                        System.out.println("Select a category by entering it's id:");
+                                        do {
+                                            statement = connection.createStatement();
 
-                        }
-                        else if(pch.equals("2")){
-                            //Update requirements
-                        }
-                        else if(pch.equals("3")){
-                            //Edit profile
-                        }
-                        else if(pch.equals("4")){
-                            continue;
-                        }
+                                            String dept_id = bufferedReader.readLine();
+                                            d_id = Integer.parseInt(dept_id);
+
+                                            ResultSet resultSet1 = statement.executeQuery("select * from Department where dept_id=" + d_id);
+                                            if (!resultSet1.next()) {
+                                                System.out.println("please enter correct department id");
+                                                statement.close();
+                                                continue;
+                                            }
+                                            statement.close();
+                                            break;
+                                        } while (true);
+                                        String doc_id;
+
+                                        System.out.println("Select:\n1)Select a doctor\n2)Use shs to select a doctor for you");
+                                        int shs_ch;
+                                        do {
+                                            shs_ch = Integer.parseInt(bufferedReader.readLine());
+                                            if (shs_ch != 1 && shs_ch != 2) {
+                                                System.out.println("Enter either 1 or 2");
+                                                continue;
+                                            }
+                                            break;
+                                        } while (true);
+                                        if (shs_ch == 1) {
+                                            show_doctors(connection, d_id);
+                                            do {
+                                                doc_id = bufferedReader.readLine();
+                                                statement = connection.createStatement();
+                                                ResultSet resultSet1 = statement.executeQuery("select * from Doctor where doctor_id=" + doc_id + "and dept_id=" + d_id);
+                                                if (!resultSet1.next()) {
+                                                    System.out.println("please enter correct Doctor id");
+                                                    statement.close();
+                                                    continue;
+                                                }
+                                                statement.close();
+                                                break;
+                                            } while (true);
+                                        } else {
+                                            doc_id = algo(connection, d_id);
+                                        }
+                                        PreparedStatement ps=connection.prepareStatement("Update Patient set doctor_id = ? , dept_id = ? where patient_id = ?");
+                                        ps.setString(1,doc_id);
+                                        ps.setInt(2,d_id);
+                                        ps.setString(3,pid);
+                                        ps.executeUpdate();
+                                        ps.close();
+                                    }
+                                }
+                            }
+                            else if (pch.equals("4")) {
+                                break;
+                            }
+                        }while(true);
                     }
                 }
                 else if (pch.equals("2")) {
@@ -334,30 +634,102 @@ public class SmartHealth {
                     String email=bufferedReader.readLine();
                     System.out.println("Enter the password :");
                     String password=bufferedReader.readLine();
+                    int d_id;
+                    show_departments(connection);
+                    do {
+                        Statement statement = connection.createStatement();
 
-                    StringBuilder stringBuilder=new StringBuilder();
-                    stringBuilder.append("patient_");
-                    stringBuilder.append(patient_ID);
-                    String patientID=stringBuilder.toString();
+                        String dept_id = bufferedReader.readLine();
+                        d_id = Integer.parseInt(dept_id);
+
+                        ResultSet resultSet1 = statement.executeQuery("select * from Department where dept_id=" + d_id);
+                        if (!resultSet1.next()) {
+                            System.out.println("please enter correct department id");
+                            statement.close();
+                            continue;
+                        }
+                        statement.close();
+                        break;
+                    }while(true);
+                    String doc_id;
+                    System.out.println("Enter Location:\n1) OPD\n2) LOCAL");
+                    int location;
+                    do {
+                        location = Integer.parseInt(bufferedReader.readLine());
+                        if(location!=1 && location!=2){
+                            System.out.println("Enter either 1 or 2");
+                            continue;
+                        }
+                        break;
+                    }while(true);
+                    if(location==1) {
+                        System.out.println("Select:\n1)Select a doctor\n2)Use shs to select a doctor for you");
+                        int shs_ch;
+                        do {
+                            shs_ch = Integer.parseInt(bufferedReader.readLine());
+                            if(shs_ch!=1 && shs_ch!=2){
+                                System.out.println("Enter either 1 or 2");
+                                continue;
+                            }
+                            break;
+                        }while(true);
+                        if(shs_ch==1) {
+                            show_doctors(connection, d_id);
+                            do {
+                                doc_id = bufferedReader.readLine();
+                                Statement statement = connection.createStatement();
+                                ResultSet resultSet1 = statement.executeQuery("select * from Doctor where doctor_id='" + doc_id + "' and dept_id=" + d_id);
+                                if (!resultSet1.next()) {
+                                    System.out.println("please enter correct Doctor id");
+                                    statement.close();
+                                    continue;
+                                }
+                                statement.close();
+                                break;
+                            } while (true);
+                        }
+                        else{
+                            doc_id = algo(connection, d_id);
+                        }
+                    }
+                    else{
+                        doc_id = algo(connection, d_id);
+                    }
+
+                    String query = "SELECT patient_id FROM Ids";
+                    Statement statement = connection.createStatement();
+                    ResultSet resultSet = statement.executeQuery(query);
+                    resultSet.next();
+                    int i = resultSet.getInt("patient_id");
+                    query = "SELECT dept_name FROM Department where dept_id = "+d_id;
+                    resultSet = statement.executeQuery(query);
+                    resultSet.next();
+                    String dep = resultSet.getString("dept_name");
+                    i += 1;
+                    statement.close();
+
+                    String patientID= dep.substring(0,3) + "_" + i;
 
 
                     Patient patient=new Patient(name,age,gender,contact,address,email,password,patientID);
-                    patient_ID++;
                     try
                     {
-                        //smartHealthApplication.registerPatient(patient,connection);
-                        //System.out.println("you have been successfully registered with ID : " + patientID);
-
-
+                        patient.register_patient(connection, doc_id, d_id, location);
+                        System.out.println("you have been successfully registered with ID : " + patientID + " and alloted Doctor having id "+doc_id);
+                        if(location==2){
+                            System.out.println("Come and meet doctor");
+                        }
+                        query = "UPDATE Ids SET patient_id = ?";
+                        PreparedStatement preparedStatement = connection.prepareStatement(query);
+                        preparedStatement.setInt(1, i);
+                        preparedStatement .executeUpdate();
+                        preparedStatement.close();
                     }
                     catch (Exception e)
                     {
                         System.out.println("Could not register you !!! Please try after some time");
 
                     }
-
-
-
                 }
             } else if (menu_option.equals("3")) {
 
@@ -599,12 +971,6 @@ public class SmartHealth {
                                 Doctor doctor=new Doctor();
                                 doctor.getProfile().setId(input_uid);
                                 boolean flag=doctor.showAllAppointments(connection);
-                                if(flag==false)
-                                {
-                                    continue;
-                                    //System.out.println("there are no appointments");
-                                }
-
 
 
                             }
@@ -614,11 +980,7 @@ public class SmartHealth {
                                 Doctor doctor=new Doctor();
                                 doctor.getProfile().setId(input_uid);
                                 boolean flag=doctor.showTodaysAppointment(connection);
-                                if(flag==false)
-                                {
-                                    continue;
-                                    //System.out.println("there are no appointments");
-                                }
+
 
                             }
                             else
@@ -633,10 +995,33 @@ public class SmartHealth {
                             int position=resultSet.getInt("position_in_dept");
 
                             int surgeon=resultSet.getInt("surgeon");
+                            int dept_id=resultSet.getInt("dept_id");
                             if(position==4)
                             {
-
+                                SeniorSpecialist seniorSpecialist=new SeniorSpecialist();
+                                seniorSpecialist.getProfile().setId(input_uid);
+                                seniorSpecialist.setDepartmentNumber(resultSet.getInt("dept_id"));
                                 System.out.println("transfer to another department");
+                                int flag=seniorSpecialist.transferToDepartment(connection,bufferedReader);
+                                if(flag==0)
+                                {
+                                    System.out.println("please enter correct patient id ");
+
+                                }
+                                else if(flag==1)
+                                {
+                                    System.out.println("please enter the correct department id");
+                                }
+                                else if(flag==2)
+                                {
+                                    System.out.println("please enter the correct doctor id");
+                                }
+                                else
+                                {
+                                    System.out.println("The transfer request has been initiated");
+                                }
+
+
 
                             }
                             else if(position==3)
@@ -644,14 +1029,38 @@ public class SmartHealth {
                                  System.out.println("please select the transfer type");
                                  System.out.println("1. transfer inside department");
                                  System.out.println("2. transfer to another department");
+                                 Specialist specialist=new Specialist();
+                                 specialist.getProfile().setId(input_uid);
+                                 specialist.setDepartmentNumber(resultSet.getInt("dept_id"));
+                                 System.out.println("transfer to another department");
                                  String option=bufferedReader.readLine();
                                  if(option.equals("1"))
                                  {
+
 
                                  }
                                  else if(option.equals("2"))
                                  {
                                      System.out.println("transfer to another department ");
+                                     int flag=specialist.transferToDepartment(connection,bufferedReader);
+                                     if(flag==0)
+                                     {
+                                         System.out.println("please enter correct patient id ");
+
+                                     }
+                                     else if(flag==1)
+                                     {
+                                         System.out.println("please enter the correct department id");
+                                     }
+                                     else if(flag==2)
+                                     {
+                                         System.out.println("please enter the correct doctor id");
+
+                                     }
+                                     else
+                                     {
+                                         System.out.println("The transfer request has been initiated");
+                                     }
                                  }
                                  else
                                  {
@@ -772,6 +1181,7 @@ public class SmartHealth {
                                         continue;
                                     }
                                 }
+
                                 preparedStatement_update.close();
 
                                 preparedStatement_update=connection.prepareStatement("update Doctor set password =? where doctor_id = ?");
@@ -810,15 +1220,13 @@ public class SmartHealth {
 
                     PreparedStatement preparedStatement1=connection.prepareStatement("update Patient set seen = 1 where doctor_id = ?");
                     preparedStatement1.setString(1,input_uid);
-                    preparedStatement.executeUpdate();
+                    preparedStatement1.executeUpdate();
 
                     preparedStatement.close();
 
                     System.out.println("You have been successfully logged out ");
 
-
-
-                }
+            }
 
 
 
